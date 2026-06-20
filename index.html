@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NFT Exchange Mini App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://unpkg.com/@tonconnect/ui@2.0.6/dist/tonconnect-ui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tonconnect/ui@2.0.6/dist/tonconnect-ui.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -63,50 +63,56 @@
             console.error(e);
         }
 
-        let tonConnectUI;
+        // Ждем полной загрузки всех скриптов (включая TON Connect)
+        window.addEventListener('DOMContentLoaded', () => {
+            let tonConnectUI;
 
-        // Безопасная инициализация TON Connect
-        try {
-            tonConnectUI = new TONConnectUI.TonConnectUI({
-                manifestUrl: 'https://raw.githubusercontent.com/ton-connect/demo-dapp/main/public/tonconnect-manifest.json',
-                buttonRootId: 'ton-connect-btn'
-            });
-
-            const sendBtn = document.getElementById('send-nft-btn');
-
-            // Следим за статусом кошелька
-            tonConnectUI.onStatusChange(wallet => {
-                if (wallet) {
-                    sendBtn.style.display = 'inline-block';
-                } else {
-                    sendBtn.style.display = 'none';
+            try {
+                // Проверяем, загрузилась ли библиотека в глобальную видимость
+                if (typeof TONConnectUI === 'undefined') {
+                    throw new Error("Библиотека TONConnectUI не загрузилась с CDN. Попробуйте обновить страницу.");
                 }
-            });
 
-            sendBtn.addEventListener('click', async () => {
-                const transaction = {
-                    validUntil: Math.floor(Date.now() / 1000) + 60,
-                    messages: [
-                        {
-                            address: "EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c",
-                            amount: "10000000" // 0.01 TON для теста списания комиссии за транзакцию
-                        }
-                    ]
-                };
+                tonConnectUI = new TONConnectUI.TonConnectUI({
+                    manifestUrl: 'https://raw.githubusercontent.com/ton-connect/demo-dapp/main/public/tonconnect-manifest.json',
+                    buttonRootId: 'ton-connect-btn'
+                });
 
-                try {
-                    await tonConnectUI.sendTransaction(transaction);
-                    alert("Успешно!");
-                    if (window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.close();
-                } catch (e) {
-                    alert("Ошибка транзакции или отмена.");
-                }
-            });
+                const sendBtn = document.getElementById('send-nft-btn');
 
-        } catch (error) {
-            // Если скрипт упал, мы увидим текст ошибки прямо на экране телефона
-            document.getElementById('error-log').innerText = "Ошибка запуска TON Connect: " + error.message;
-        }
+                tonConnectUI.onStatusChange(wallet => {
+                    if (wallet) {
+                        sendBtn.style.display = 'inline-block';
+                    } else {
+                        sendBtn.style.display = 'none';
+                    }
+                });
+
+                sendBtn.addEventListener('click', async () => {
+                    const transaction = {
+                        validUntil: Math.floor(Date.now() / 1000) + 60,
+                        messages: [
+                            {
+                                // ВСТАВЬ СВОЙ АДРЕС ВМЕСТО ЭТОЙ ЗАГЛУШКИ:
+                                address: "UQB1T3VLoL9Cx2MzVdLte1A_jAN8BpAieopmkSJwvXKf0l3-",
+                                amount: "10000000" 
+                            }
+                        ]
+                    };
+
+                    try {
+                        await tonConnectUI.sendTransaction(transaction);
+                        alert("Успешно!");
+                        if (window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.close();
+                    } catch (e) {
+                        alert("Ошибка транзакции или отмена.");
+                    }
+                });
+
+            } catch (error) {
+                document.getElementById('error-log').innerText = "Ошибка запуска: " + error.message;
+            }
+        });
     </script>
 </body>
 </html>
