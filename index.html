@@ -15,7 +15,7 @@
             padding: 20px;
         }
         #ton-connect-btn {
-            margin: 20px auto;
+            margin: 30px auto;
             display: block;
             min-height: 40px;
         }
@@ -28,6 +28,7 @@
             font-size: 16px;
             cursor: pointer;
             display: none;
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -38,7 +39,6 @@
 
     <div id="ton-connect-btn"></div>
 
-    <br>
     <button id="send-nft-btn" class="btn-send">Отправить NFT на обмен</button>
 
     <script>
@@ -49,18 +49,11 @@
             tg.expand();
         }
 
-        // Передаем манифест напрямую объектом, а не ссылкой на файл
+        // Инициализация TON Connect UI с проверенным универсальным манифестом
         const tonConnectUI = new TONConnectUI.TonConnectUI({
-            manifestUrl: null, // Отключаем внешнюю ссылку
+            manifestUrl: 'https://raw.githubusercontent.com/ton-connect/demo-dapp/main/public/tonconnect-manifest.json',
             buttonRootId: 'ton-connect-btn'
         });
-
-        // Принудительно задаем данные нашего Mini App внутри скрипта
-        tonConnectUI.connector.manifest = {
-            url: "https://bannyslayser.github.io/my-nft-app/",
-            name: "NFT Exchange",
-            iconUrl: "https://ton.org/front/img/ton_logo.svg"
-        };
 
         const sendBtn = document.getElementById('send-nft-btn');
 
