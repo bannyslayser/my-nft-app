@@ -16,7 +16,8 @@
         }
         #ton-connect-btn {
             margin: 20px auto;
-            display: inline-block;
+            display: block;
+            min-height: 40px;
         }
         .btn-send {
             background-color: #2481cc;
@@ -26,7 +27,7 @@
             border-radius: 8px;
             font-size: 16px;
             cursor: pointer;
-            display: none; /* Покажем только после подключения кошелька */
+            display: none;
         }
     </style>
 </head>
@@ -43,48 +44,45 @@
     <script>
         // Инициализация Telegram Web App
         const tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand(); // Расширяем окно на весь экран
+        if (tg) {
+            tg.ready();
+            tg.expand();
+        }
 
-        // Инициализация TON Connect UI
+        // Инициализация TON Connect UI с твоим манифестом
         const tonConnectUI = new TONConnectUI.TonConnectUI({
-            manifestUrl: 'https://bannyslayser.github.io/my-nft-app/tonconnect-manifest.json', // Демо-манифест (для тестов ок)
+            manifestUrl: 'https://bannyslayser.github.io/my-nft-app/tonconnect-manifest.json',
             buttonRootId: 'ton-connect-btn'
         });
 
         const sendBtn = document.getElementById('send-nft-btn');
 
-        // Следим за статусом подключения кошелька
+        // Следим за статусом кошелька
         tonConnectUI.onStatusChange(wallet => {
             if (wallet) {
-                sendBtn.style.display = 'inline-block'; // Показываем кнопку отправки
+                sendBtn.style.display = 'inline-block';
             } else {
                 sendBtn.style.display = 'none';
             }
         });
 
-        // Логика кнопки отправки транзакции
         sendBtn.addEventListener('click', async () => {
-            // Шаблон транзакции (в реальном проекте сюда подставляется адрес твоего кошелька и данные NFT)
             const transaction = {
-                validUntil: Math.floor(Date.now() / 1000) + 60, // Срок действия 60 секунд
+                validUntil: Math.floor(Date.now() / 1000) + 60,
                 messages: [
                     {
-                        address: "EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c", // Твой TON кошелек (куда уйдет перевод)
-                        amount: "10000000" // Сумма комиссии в нано-ТОН (0.01 TON)
-                        // Для отправки именно NFT сюда добавляется специальный payload (payload архитектуры TON NFT)
+                        address: "EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c",
+                        amount: "10000000"
                     }
                 ]
             };
 
             try {
-                // Вызываем окно кошелька у пользователя
                 const result = await tonConnectUI.sendTransaction(transaction);
-                alert("Транзакция отправлена! Хэш: " + result.boc);
-                tg.close(); // Закрываем Mini App после успеха
+                alert("Успешно!");
+                if (tg) tg.close();
             } catch (e) {
-                console.error(e);
-                alert("Ошибка или отмена транзакции.");
+                alert("Ошибка транзакции.");
             }
         });
     </script>
